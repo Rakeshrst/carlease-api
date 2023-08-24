@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: car-lease-api
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/carleasedb
+    username: carleaseuser
+    password: carleasepwd
+  liquibase:
+    enabled: true
+    url: jdbc:postgresql://localhost:5432/carleasedb
+    user: carleaseuser
+    password: carleasepwd
+    contexts: local
+    change-log: classpath:db/db-changelog.yaml
+  cloud:
+    config:
+      enabled: false
+server:
+  port: 8081
+iam-service:
+  url: http://localhost:8080
+  clientId: carleaseapi@autolease.com
+  clientSecret: CarLease@1234
+  introspectResource: /api/auth/introspect
+  loginResource: /api/auth/token
+
+car-lease:
+  allowedRoles: Broker, Employee
+customer:
+  allowedRoles: Broker, Employee
+car:
+  read:
+    allowedRoles: Broker, Employee
+  update:
+    allowedRoles: Employee
+
+logging:
+  level:
+    io.r2dbc: INFO
+    io.r2dbc.postgresql.QUERY: INFO # for queries
+    io.r2dbc.postgresql.PARAM: INFO # for parameters

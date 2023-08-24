@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: RST
+      changes:
+        - sqlFile:
+            path: classpath:db/sql/create_customers_table.sql
+
+  - changeSet:
+      id: 2
+      author: RST
+      changes:
+        - sqlFile:
+            path: classpath:db/sql/create_cars_table.sql
+
+  - changeSet:
+      id: 3
+      author: RST
+      changes:
+        - sqlFile:
+            path: classpath:db/sql/create_lease_quotations_table.sql
+
+  - changeSet:
+      id: 4
+      author: RST
+      changes:
+        - sqlFile:
+            path: classpath:db/sql/create_lease_contracts_table.sql
+  - changeSet:
+      id: 5
+      author: RST
+      changes:
+        - sqlFile:
+            path: classpath:db/sql/data_cars.sql
+
+  - changeSet:
+      id: 6
+      author: RST
+      changes:
+        - sqlFile:
+            path: classpath:db/sql/data_customers.sql
