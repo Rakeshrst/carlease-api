@@ -6,8 +6,6 @@ import com.rstontherun.carleaseapi.data.LeaseQuotation;
 import com.rstontherun.carleaseapi.domain.LeaseRateRequest;
 import com.rstontherun.carleaseapi.exception.CarNotFoundException;
 import com.rstontherun.carleaseapi.exception.CustomerNotFoundException;
-import com.rstontherun.carleaseapi.exception.ForbiddenException;
-import com.rstontherun.carleaseapi.exception.UnauthorizedException;
 import com.rstontherun.carleaseapi.model.LeaseQuotationResponse;
 import com.rstontherun.carleaseapi.service.AuthorizationService;
 import com.rstontherun.carleaseapi.service.CarService;
@@ -27,6 +25,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import static com.rstontherun.carleaseapi.utils.TokenDecoderutility.extractUserName;
+import static com.rstontherun.carleaseapi.utils.TokenDecoderutility.getAuthorizationHeader;
 
 @Component
 @RequiredArgsConstructor
@@ -43,84 +42,48 @@ public class LeaseQuotationHandler {
 
 
     public Mono<ServerResponse> calculateLeaseRate(ServerRequest request) {
-        var loggedBy = validateToken(request);
-        return request.bodyToMono(LeaseRateRequest.class)
-                .flatMap(leaseRateRequest -> carService.getNettPriceByCarId(leaseRateRequest.getCarId())
-                        .flatMap(nettPrice -> {
-                            leaseRateRequest.setLoggedBy(loggedBy);
-                            leaseRateRequest.setNettPrice(nettPrice);
+        String authorizationHeader = getAuthorizationHeader(request);
+        return authService.validateCustomerToken(authorizationHeader, allowedRoles)
+                .then(request.bodyToMono(LeaseRateRequest.class)
+                        .flatMap(leaseRateRequest -> carService.getNettPriceByCarId(leaseRateRequest.getCarId())
+                                .flatMap(nettPrice -> {
+                                    leaseRateRequest.setLoggedBy(extractUserName(authorizationHeader));
+                                    leaseRateRequest.setNettPrice(nettPrice);
 
-                            Mono<Customer> customerMono = customerService.getCustomerByEmail(leaseRateRequest.getCustomerEmail())
-                                    .switchIfEmpty(Mono.error(new CustomerNotFoundException("Customer not found")));
-                            Mono<Car> carMono = carService.findById(leaseRateRequest.getCarId())
-                                    .switchIfEmpty(Mono.error(new CarNotFoundException("Car not found")));
+                                    Mono<Customer> customerMono = customerService.getCustomerByEmail(leaseRateRequest.getCustomerEmail())
+                                            .switchIfEmpty(Mono.error(new CustomerNotFoundException("Customer not found")));
+                                    Mono<Car> carMono = carService.findById(leaseRateRequest.getCarId())
+                                            .switchIfEmpty(Mono.error(new CarNotFoundException("Car not found")));
 
-                            return Mono.zip(customerMono, carMono)
-                                    .flatMap(tuple -> {
-                                        Customer customer = tuple.getT1();
-                                        Car car = tuple.getT2();
-                                        if (customer != null && car != null) {
-                                            return leaseService.createLeaseQuotation(leaseRateRequest)
+                                    return Mono.zip(customerMono, carMono)
+                                            .flatMap(tuple -> leaseService.createLeaseQuotation(leaseRateRequest)
                                                     .flatMap(savedLeaseQuotation ->
                                                             ServerResponse.created(URI.create("/leaseQuotations/" + savedLeaseQuotation.getQuotationId()))
                                                                     .contentType(MediaType.APPLICATION_JSON)
-                                                                    .bodyValue(savedLeaseQuotation));
-                                        } else {
-                                            if (customer == null) {
-                                                return ServerResponse.badRequest()
-                                                        .contentType(MediaType.APPLICATION_JSON)
-                                                        .bodyValue("Customer not found");
-                                            } else {
-                                                return ServerResponse.badRequest()
-                                                        .contentType(MediaType.APPLICATION_JSON)
-                                                        .bodyValue("Car not found");
-                                            }
-                                        }
-                                    });
-                        }));
+                                                                    .bodyValue(savedLeaseQuotation)));
+                                })));
+
     }
 
-    private String validateToken(ServerRequest request) {
-        List<String> authorizationHeaders = request.headers().header("Authorization");
-
-        if (authorizationHeaders.isEmpty()) {
-            throw new UnauthorizedException("Authorization header missing");
-        }
-
-        String authorizationHeader = authorizationHeaders.get(0);
-
-        return extractUserName(authorizationHeader);
-    }
 
     public Mono<ServerResponse> getLeaseQuotationByCustomerEmail(ServerRequest request) {
         String customerEmail = request.pathVariable("customerEmail");
-        List<String> authorizationHeaders = request.headers().header("Authorization");
-
-        if (authorizationHeaders.isEmpty()) {
-            throw new UnauthorizedException("Authorization header missing");
-        }
-
-        String authorizationHeader = authorizationHeaders.get(0);
+        String authorizationHeader = getAuthorizationHeader(request);
 
         return authService.validateCustomerToken(authorizationHeader, allowedRoles)
-                .flatMap(role -> { System.out.println("Role: " +role);
-                    if (allowedRoles.contains (role)) {
-                        return leaseService.getLeaseQuotationByCustomerEmail(customerEmail)
-                                .flatMap(getLeaseQuotationMonoResponse())
-                                .collectList()
-                                .flatMap(response -> ServerResponse.ok()
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .bodyValue(response))
-                                .switchIfEmpty(ServerResponse.notFound().build());
-                    }
-                    return Mono.error(new ForbiddenException("Invalid roles"));
-                });
+                .then(leaseService.getLeaseQuotationByCustomerEmail(customerEmail)
+                        .flatMap(getLeaseQuotationMonoResponse())
+                        .collectList()
+                        .flatMap(response -> ServerResponse.ok()
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(response))
+                        .switchIfEmpty(ServerResponse.notFound().build()));
     }
 
     private Function<LeaseQuotation, Mono<? extends LeaseQuotationResponse>> getLeaseQuotationMonoResponse() {
         return leaseQuotation -> {
             Mono<Customer> customerMono = customerService.getCustomerByEmail(leaseQuotation.getCustomerEmail());
-            Mono<Car> carMono = carService.findById(Integer.valueOf(leaseQuotation.getCarId()));
+            Mono<Car> carMono = carService.findById(leaseQuotation.getCarId());
             return Mono.zip(customerMono, carMono)
                     .map(tuple -> getLeaseQuotationResponse(leaseQuotation, tuple));
         };
@@ -148,15 +111,16 @@ public class LeaseQuotationHandler {
     }
 
     public Mono<ServerResponse> getLeaseQuotationByQuoteId(ServerRequest request) {
-        validateToken(request);
+        String authorizationHeader = getAuthorizationHeader(request);
 
         Integer quotationId = Integer.parseInt(request.pathVariable("quotationId"));
-        return leaseService.getLeaseQuotationById(quotationId)
-                .flatMap(getLeaseQuotationMonoResponse())
-                .flatMap(response -> ServerResponse.ok()
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(response))
-                .switchIfEmpty(ServerResponse.notFound().build());
+        return authService.validateCustomerToken(authorizationHeader, allowedRoles)
+                .then(leaseService.getLeaseQuotationById(quotationId)
+                        .flatMap(getLeaseQuotationMonoResponse())
+                        .flatMap(response -> ServerResponse.ok()
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(response))
+                        .switchIfEmpty(ServerResponse.notFound().build()));
     }
 
 }

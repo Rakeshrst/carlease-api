@@ -7,8 +7,6 @@ import com.rstontherun.carleaseapi.domain.LeaseRateRequest;
 import com.rstontherun.carleaseapi.exception.DataNotFoundException;
 import com.rstontherun.carleaseapi.repository.LeaseContractsRepository;
 import com.rstontherun.carleaseapi.repository.LeaseQuotationRepository;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,7 +17,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
 
 @Service
 @Slf4j
@@ -51,9 +48,9 @@ public class LeaseService {
     }
 
     private static double getLeaseRate(LeaseRateRequest leaseRateRequest) {
-        double leaseRate = ((leaseRateRequest.getMileage() / 12) * leaseRateRequest.getDuration() / leaseRateRequest.getNettPrice())
+
+        return ((leaseRateRequest.getMileage() / 12) * leaseRateRequest.getDuration() / leaseRateRequest.getNettPrice())
                 + ((leaseRateRequest.getInterestRate() / 100) * leaseRateRequest.getNettPrice()) / 12;
-        return leaseRate;
     }
 
     public Mono<LeaseContracts> confirmContract(LeaseContractRequest contractRequest, String contractedBy) {
@@ -70,7 +67,7 @@ public class LeaseService {
     private LeaseContracts buildLeaseContract(LeaseQuotation quotation, String contractedBy) {
         return LeaseContracts.builder()
                 .customerEmail(quotation.getCustomerEmail())
-                .carId(Integer.valueOf(quotation.getCarId()))
+                .carId(quotation.getCarId())
                 .quotationId(quotation.getQuotationId())
                 .mileage(quotation.getMileage())
                 .startDate(quotation.getExpectedStartDate())
@@ -85,7 +82,7 @@ public class LeaseService {
                 .build();
     }
 
-    private  LocalDate calculateEndDate(LocalDate startDate, int duration) {
+    private LocalDate calculateEndDate(LocalDate startDate, int duration) {
         long millisecondsInDay = 24L * 60 * 60 * 1000;
         long totalMilliseconds = startDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
                 + duration * millisecondsInDay;
@@ -94,7 +91,7 @@ public class LeaseService {
         return instant.atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
-public Mono<LeaseContracts> endLease(Integer contractId, String contractedBy) {
+    public Mono<LeaseContracts> endLease(Integer contractId, String contractedBy) {
         return leaseContractsRepository.findById(contractId)
                 .flatMap(leaseContract -> {
                     if (leaseContract.isActive()) {
@@ -111,23 +108,23 @@ public Mono<LeaseContracts> endLease(Integer contractId, String contractedBy) {
 
     public Mono<LeaseQuotation> getLeaseQuotationById(Integer quotationId) {
         return leaseQuotationRepository.findById(quotationId)
-                .switchIfEmpty(Mono.error( new DataNotFoundException("Lease Quotation not Found")));
+                .switchIfEmpty(Mono.error(new DataNotFoundException("Lease Quotation not Found")));
     }
 
     public Flux<LeaseQuotation> getLeaseQuotationByCustomerEmail(String customerEmail) {
         return leaseQuotationRepository.findByCustomerEmail(customerEmail)
-                .switchIfEmpty(Flux.error( new DataNotFoundException("Lease Quotation not Found")));
+                .switchIfEmpty(Flux.error(new DataNotFoundException("Lease Quotation not Found")));
     }
 
     public Flux<LeaseContracts> getLeaseContractByCustomerEmail(String customerEmail) {
         return leaseContractsRepository.findByCustomerEmail(customerEmail)
-                .switchIfEmpty(Flux.error( new DataNotFoundException("Lease Contract not Found")));
+                .switchIfEmpty(Flux.error(new DataNotFoundException("Lease Contract not Found")));
     }
 
 
     public Mono<LeaseContracts> getLeaseContractById(Integer contractId) {
         return leaseContractsRepository.findById(contractId)
-                .switchIfEmpty(Mono.error( new DataNotFoundException("Lease Contract not Found")));
+                .switchIfEmpty(Mono.error(new DataNotFoundException("Lease Contract not Found")));
     }
 }
 

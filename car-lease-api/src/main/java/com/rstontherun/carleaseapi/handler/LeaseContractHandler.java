@@ -14,7 +14,6 @@ import com.rstontherun.carleaseapi.service.CarService;
 import com.rstontherun.carleaseapi.service.CustomerService;
 import com.rstontherun.carleaseapi.service.LeaseService;
 import com.rstontherun.carleaseapi.utils.TokenDecoderutility;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -26,6 +25,8 @@ import reactor.util.function.Tuple2;
 
 import java.net.URI;
 import java.util.List;
+
+import static com.rstontherun.carleaseapi.utils.TokenDecoderutility.getAuthorizationHeader;
 
 @Component
 @RequiredArgsConstructor
@@ -49,45 +50,21 @@ public class LeaseContractHandler {
         String authorizationHeader = authorizationHeaders.get(0);
         authService.validateCustomerToken(authorizationHeader, allowedRoles);
 
-        var contractedBy = extractUserName(authorizationHeader);;
+        var contractedBy = extractUserName(authorizationHeader);
+
         return request.bodyToMono(LeaseContractRequest.class)
                 .flatMap(confirmationRequest -> Mono.zip(getCustomer(confirmationRequest.getCustomerEmail()),
                                 getCar(confirmationRequest.getCarId()))
-                        .flatMap(tuple -> {
-                            Customer customer = tuple.getT1();
-                            Car car = tuple.getT2();
-
-                            if (customer != null && car != null) {
-                                return leaseService.confirmContract(confirmationRequest, contractedBy)
-                                        .flatMap(confirmedContract ->
-                                                ServerResponse.created(URI.create("/leaseContracts/" + confirmedContract.getContractId()))
-                                                        .contentType(MediaType.APPLICATION_JSON)
-                                                        .bodyValue(confirmedContract))
-                                        .switchIfEmpty(ServerResponse.notFound().build());
-                            } else {
-                                if (customer == null) {
-                                    return ServerResponse.badRequest()
-                                            .contentType(MediaType.APPLICATION_JSON)
-                                            .bodyValue("Customer not found");
-                                } else {
-                                    return ServerResponse.badRequest()
-                                            .contentType(MediaType.APPLICATION_JSON)
-                                            .bodyValue("Car not found");
-                                }
-                            }
-                        }));
+                        .flatMap(tuple -> leaseService.confirmContract(confirmationRequest, contractedBy)
+                                .flatMap(confirmedContract ->
+                                        ServerResponse.created(URI.create("/leaseContracts/" + confirmedContract.getContractId()))
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .bodyValue(confirmedContract))
+                                .switchIfEmpty(ServerResponse.notFound().build())));
     }
 
-    private String validateToken(ServerRequest request) {
-        List<String> authorizationHeaders = request.headers().header("Authorization");
-
-        if (authorizationHeaders.isEmpty()) {
-            throw new UnauthorizedException("Authorization header missing");
-        }
-
-        String authorizationHeader = authorizationHeaders.get(0);
-        authService.validateCustomerToken(authorizationHeader, allowedRoles);
-        return extractUserName(authorizationHeader);
+    private String extractUserName(String token) {
+        return (String) TokenDecoderutility.getClaimSets(token).get("sub");
     }
 
     private Mono<Customer> getCustomer(String leaseContract) {
@@ -100,36 +77,34 @@ public class LeaseContractHandler {
                 .switchIfEmpty(Mono.error(new CarNotFoundException("Car not found")));
     }
 
-    private String extractUserName(String token) {
-        return (String) TokenDecoderutility.getClaimSets(token).get("sub");
-    }
-
     public Mono<ServerResponse> endLease(ServerRequest request) {
-        String contractedBy = validateToken(request);
+        String authorizationHeader = getAuthorizationHeader(request);
 
         Integer contractId = Integer.parseInt(request.pathVariable("contractId"));
 
-        return leaseService.endLease(contractId, contractedBy)
-                .flatMap(endedContract ->
-                        ServerResponse.ok()
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .bodyValue(endedContract))
-                .switchIfEmpty(ServerResponse.notFound().build());
+        return authService.validateCustomerToken(authorizationHeader, allowedRoles)
+                .then(leaseService.endLease(contractId, extractUserName(authorizationHeader))
+                        .flatMap(endedContract ->
+                                ServerResponse.ok()
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(endedContract))
+                        .switchIfEmpty(ServerResponse.notFound().build()));
     }
 
     public Mono<ServerResponse> getLeaseContract(ServerRequest request) {
-        validateToken(request);
+        String authorizationHeader = getAuthorizationHeader(request);
 
         Integer contractId = Integer.valueOf(request.pathVariable("contractId"));
-        return leaseService.getLeaseContractById(contractId)
-                .flatMap(leaseContract ->
-                        Mono.zip(getCustomer(leaseContract.getCustomerEmail()),
-                                        getCar(leaseContract.getCarId()))
-                                .map(tuple -> getLeaseContractResponse(leaseContract, tuple)))
-                .flatMap(response -> ServerResponse.ok()
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(response))
-                .switchIfEmpty(ServerResponse.notFound().build());
+        return authService.validateCustomerToken(authorizationHeader, allowedRoles)
+                .then(leaseService.getLeaseContractById(contractId)
+                        .flatMap(leaseContract ->
+                                Mono.zip(getCustomer(leaseContract.getCustomerEmail()),
+                                                getCar(leaseContract.getCarId()))
+                                        .map(tuple -> getLeaseContractResponse(leaseContract, tuple)))
+                        .flatMap(response -> ServerResponse.ok()
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(response))
+                        .switchIfEmpty(ServerResponse.notFound().build()));
     }
 
     private static LeaseContractResponse getLeaseContractResponse(LeaseContracts leaseContract, Tuple2<Customer, Car> tuple) {
@@ -154,24 +129,25 @@ public class LeaseContractHandler {
     }
 
     public Mono<ServerResponse> getLeaseContractByCustomerEmail(ServerRequest request) {
-        validateToken(request);
+        String authorizationHeader = getAuthorizationHeader(request);
 
         String customerEmail = request.pathVariable("customerEmail");
-        return leaseService.getLeaseContractByCustomerEmail(customerEmail)
-                .flatMap(leaseContract -> {
-                    if (leaseContract != null) {
-                        return Mono.zip(getCustomer(leaseContract.getCustomerEmail()),
-                                        getCar(leaseContract.getCarId()))
-                                .map(tuple -> getLeaseContractResponse(leaseContract, tuple));
-                    } else {
-                        return Mono.error(new DataNotFoundException("Lease contract not found"));
-                    }
-                })
-                .collectList()
-                .flatMap(response -> ServerResponse.ok()
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(response))
-                .switchIfEmpty(ServerResponse.notFound().build());
+        return authService.validateCustomerToken(authorizationHeader, allowedRoles)
+                .then(leaseService.getLeaseContractByCustomerEmail(customerEmail)
+                        .flatMap(leaseContract -> {
+                            if (leaseContract != null) {
+                                return Mono.zip(getCustomer(leaseContract.getCustomerEmail()),
+                                                getCar(leaseContract.getCarId()))
+                                        .map(tuple -> getLeaseContractResponse(leaseContract, tuple));
+                            } else {
+                                return Mono.error(new DataNotFoundException("Lease contract not found"));
+                            }
+                        })
+                        .collectList()
+                        .flatMap(response -> ServerResponse.ok()
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(response))
+                        .switchIfEmpty(ServerResponse.notFound().build()));
     }
 }
 

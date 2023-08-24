@@ -1,0 +1,625 @@
+{
+	"info": {
+		"_postman_id": "378b712c-4363-4a11-ad94-89fe76755699",
+		"name": "CarLease API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15215945"
+	},
+	"item": [
+		{
+			"name": "Register-Customer API",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"name\": \"Customer API\",\r\n\"email\": \"customerapi@autolease.com\",\r\n\"userName\": \"customerapi\",\r\n\"password\": \"Customer@1234\",\r\n\"userRole\": \"Employee\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/auth/register",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register-Car API",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"name\": \"Car API\",\r\n\"email\": \"carapi@autolease.com\",\r\n\"userName\": \"carapi\",\r\n\"password\": \"Car@1234\",\r\n\"userRole\": \"Employee\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/auth/register",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register-Car Lease API",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"name\": \"CarLease API\",\r\n\"email\": \"carleaseapi@autolease.com\",\r\n\"userName\": \"carleaseapi\",\r\n\"password\": \"CarLease@1234\",\r\n\"userRole\": \"Employee\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/auth/register",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register-Broker API",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"name\": \"Broker API\",\r\n\"email\": \"brokerapi@leaseauto.com\",\r\n\"userName\": \"brokerapi\",\r\n\"password\": \"Broker@1234\",\r\n\"userRole\": \"Employee\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/auth/register",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Gettoken-CustomerAPI",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaW5naEBzaW5naC5jb20iLCJpYXQiOjE2OTI2ODM3MzAsImV4cCI6MTY5MjY4NTE3MH0.-xvXbynnH8GTPayP_5BvpPvEQZr6O3a6GJ9nZvd8Bi4",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"email\": \"customerapi@autolease.com\",\r\n\"password\": \"Customer@1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/auth/token",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Gettoken-CarAPI",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaW5naEBzaW5naC5jb20iLCJpYXQiOjE2OTI2ODM3MzAsImV4cCI6MTY5MjY4NTE3MH0.-xvXbynnH8GTPayP_5BvpPvEQZr6O3a6GJ9nZvd8Bi4",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"email\": \"carapi@autolease.com\",\r\n\"password\": \"Car@1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/auth/token",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Gettoken CarLeaseAPI",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaW5naEBzaW5naC5jb20iLCJpYXQiOjE2OTI2ODM3MzAsImV4cCI6MTY5MjY4NTE3MH0.-xvXbynnH8GTPayP_5BvpPvEQZr6O3a6GJ9nZvd8Bi4",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"email\": \"carleaseapi@autolease.com\",\r\n\"password\": \"CarLease@1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/auth/token",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Gettoken BrokerAPI",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaW5naEBzaW5naC5jb20iLCJpYXQiOjE2OTI2ODM3MzAsImV4cCI6MTY5MjY4NTE3MH0.-xvXbynnH8GTPayP_5BvpPvEQZr6O3a6GJ9nZvd8Bi4",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"email\": \"brokerapi@leaseauto.com\",\r\n\"password\": \"Broker@1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/auth/token",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "validateToken",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiQnJva2VyIn1dLCJzdWIiOiJicm9rZXJhcGlAbGVhc2VhdXRvLmNvbSIsImlhdCI6MTY5Mjg5NDA3NCwiZXhwIjoxNjkyODk1NTE0fQ.B2FsTEAAWyBhR8EGSWqbECsl0vYvLPSfJBAnClfyswg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiQnJva2VyIn1dLCJzdWIiOiJydGhha3VyMiIsImlhdCI6MTY5MjY5OTYyNSwiZXhwIjoxNjkyNzAxMDY1fQ.83MMSshPoALaw9I762Zdq2duWAEmo085SO6ZeNnPmF0",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"email\": \"carleaseapi@autolease.com\",\r\n\"password\": \"CarLease@1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/auth/introspect",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"introspect"
+					],
+					"query": [
+						{
+							"key": "Authorization",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiQnJva2VyIn1dLCJzdWIiOiJydGhha3VyMiIsImlhdCI6MTY5MjY5OTYyNSwiZXhwIjoxNjkyNzAxMDY1fQ.83MMSshPoALaw9I762Zdq2duWAEmo085SO6ZeNnPmF0",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetLeaseQuotation",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiQnJva2VyIn1dLCJzdWIiOiJicm9rZXJhcGlAbGVhc2VhdXRvLmNvbSIsImlhdCI6MTY5MjkwMzAxMSwiZXhwIjoxNjkyOTA0NDUxfQ.zV8zTS74i6MoH68BeIGdDQfdkd_XKOASqBL6nVre2b4",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"customerEmail\": \"david.wilson@example.com\",\r\n    \"carId\": \"5\",\r\n    \"mileage\": 12000.0,\r\n    \"duration\": 60,\r\n    \"interestRate\": 6.5\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/lease/quote",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"lease",
+						"quote"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Cars",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiRW1wbG95ZWUifV0sInN1YiI6ImNhcmxlYXNlYXBpQGF1dG9sZWFzZS5jb20iLCJpYXQiOjE2OTI5MDMxNzgsImV4cCI6MTY5MjkwNDYxOH0.4A0eTT6yF9kqOTSm8CMkLA_XWFgGmGilXeTXPrvARVE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"make\": \"Toyota\",\r\n  \"model\": \"Camry\",\r\n  \"version\": \"XLE\",\r\n  \"carNumberPlate\": \"XYZ-123\",\r\n  \"numberOfDoors\": 4,\r\n  \"co2Emission\": 150,\r\n  \"grossPrice\": 30000.0,\r\n  \"nettPrice\": 28000.0\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/cars",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"cars"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Customers",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiQnJva2VyIn1dLCJzdWIiOiJicm9rZXJhcGlAbGVhc2VhdXRvLmNvbSIsImlhdCI6MTY5MjkwNzQ1MywiZXhwIjoxNjkyOTA4ODkzfQ.bPlcF73rPxlOqOGzAE4564Ehqh0QfvMO4IJ_4JYE98M",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"John Doe\",\r\n  \"street\": \"Main Street\",\r\n  \"houseNumber\": \"123\",\r\n  \"zipCode\": \"12345\",\r\n  \"place\": \"Cityville\",\r\n  \"emailAddress\": \"john@example.com\",\r\n  \"phoneNumber\": \"555-1234\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/customers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"customers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateLeaseContract",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiRW1wbG95ZWUifV0sInN1YiI6ImNhcmFwaUBhdXRvbGVhc2UuY29tIiwiaWF0IjoxNjkyOTAxMDcxLCJleHAiOjE2OTI5MDI1MTF9.ZgK9rOXFMn6kBVGNBrcS4fjM4F_fW9VseDZt08xndMI",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n \"quotationId\": 5,\r\n    \"customerEmail\": \"david.wilson@example.com\",\r\n    \"carId\": 5,\r\n    \"mileage\": 12000.0,\r\n    \"expectedStartDate\": \"2023-08-24\",\r\n    \"duration\": 60,\r\n    \"interestRate\": 6.5,\r\n    \"nettPrice\": 24000.0,\r\n    \"monthlyLeaseRate\": 132.5\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/lease/contract",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"lease",
+						"contract"
+					],
+					"query": [
+						{
+							"key": "mileage",
+							"value": "45000",
+							"disabled": true
+						},
+						{
+							"key": "duration",
+							"value": "60",
+							"disabled": true
+						},
+						{
+							"key": "interestRate",
+							"value": "4.5",
+							"disabled": true
+						},
+						{
+							"key": "customerEmail",
+							"value": "michael.johnson@example.com",
+							"disabled": true
+						},
+						{
+							"key": "carId",
+							"value": "3",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getLeaseContractByEmail",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiQnJva2VyIn1dLCJzdWIiOiJicm9rZXJhcGlAbGVhc2VhdXRvLmNvbSIsImlhdCI6MTY5MjkwMzMxMiwiZXhwIjoxNjkyOTA0NzUyfQ.S8zBRQxOEA0ZmSWOn8JxfhPlM3HXntAIR7RqbRtTyFE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/api/lease/contract/customerEmail/michael.johnson@example.com",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"lease",
+						"contract",
+						"customerEmail",
+						"michael.johnson@example.com"
+					],
+					"query": [
+						{
+							"key": "mileage",
+							"value": "45000",
+							"disabled": true
+						},
+						{
+							"key": "duration",
+							"value": "60",
+							"disabled": true
+						},
+						{
+							"key": "interestRate",
+							"value": "4.5",
+							"disabled": true
+						},
+						{
+							"key": "customerEmail",
+							"value": "michael.johnson@example.com",
+							"disabled": true
+						},
+						{
+							"key": "carId",
+							"value": "3",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getLeaseQuotationByEmail Copy",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiQnJva2VyIn1dLCJzdWIiOiJicm9rZXJhcGlAbGVhc2VhdXRvLmNvbSIsImlhdCI6MTY5MjkwMzMxMiwiZXhwIjoxNjkyOTA0NzUyfQ.S8zBRQxOEA0ZmSWOn8JxfhPlM3HXntAIR7RqbRtTyFE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/api/lease/quote/customerEmail/michael.johnson@example.com",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"lease",
+						"quote",
+						"customerEmail",
+						"michael.johnson@example.com"
+					],
+					"query": [
+						{
+							"key": "mileage",
+							"value": "45000",
+							"disabled": true
+						},
+						{
+							"key": "duration",
+							"value": "60",
+							"disabled": true
+						},
+						{
+							"key": "interestRate",
+							"value": "4.5",
+							"disabled": true
+						},
+						{
+							"key": "customerEmail",
+							"value": "michael.johnson@example.com",
+							"disabled": true
+						},
+						{
+							"key": "carId",
+							"value": "3",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

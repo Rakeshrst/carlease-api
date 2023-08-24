@@ -1,8 +1,8 @@
 package com.rstontherun.carleaseapi.service;
 
 import com.rstontherun.carleaseapi.domain.IamServiceProperties;
-import com.rstontherun.carleaseapi.exception.BadRequestException;
 import com.rstontherun.carleaseapi.exception.ForbiddenException;
+import com.rstontherun.carleaseapi.exception.UnauthorizedException;
 import lombok.SneakyThrows;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -17,7 +17,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.util.Arrays;
@@ -29,10 +28,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class AuthorizationServiceImplTest {
 
     private final MockWebServer mockWebServer = new MockWebServer();
-
     @Autowired
     private AuthorizationService authorizationService;
-
     @MockBean
     private WebClient iamWebClient;
 
@@ -58,42 +55,9 @@ class AuthorizationServiceImplTest {
     @Test
     @SneakyThrows
     void validateCustomerToken_ValidToken_ValidRole() {
-        enqueueResponse(HttpStatus.OK, 1, "{\"role\": \"Employee\"}");
-
-        Mono<String> result = authorizationService.validateCustomerToken("validToken", Arrays.asList("Employee"));
-
-        StepVerifier.create(result)
-                .expectNext("validToken")
+        enqueueResponse(HttpStatus.OK, 1, "{\"userRole\": \"Employee\"}");
+        StepVerifier.create(authorizationService.validateCustomerToken("validToken", Arrays.asList("Employee")))
                 .verifyComplete();
-
-        assertEquals("/api/auth/instrospect", mockWebServer.takeRequest().getPath());
-    }
-
-    @Test
-    @SneakyThrows
-    void validateCustomerToken_ValidToken_InvalidRole_Forbidden() {
-        enqueueResponse(HttpStatus.OK, 1, "{\"role\": \"Broker\"}");
-
-        Mono<String> result = authorizationService.validateCustomerToken("validToken", Arrays.asList("Employee"));
-
-        StepVerifier.create(result)
-                .expectError(ForbiddenException.class)
-                .verify();
-
-        assertEquals("/api/auth/instrospect", mockWebServer.takeRequest().getPath());
-    }
-
-    @Test
-    @SneakyThrows
-    void validateCustomerToken_InvalidToken_BadRequest() {
-        enqueueResponse(HttpStatus.FORBIDDEN, 1, "Bad Request");
-
-        Mono<String> result = authorizationService.validateCustomerToken("invalidToken", Arrays.asList("Employee"));
-
-        StepVerifier.create(result)
-                .expectError(BadRequestException.class)
-                .verify();
-
         assertEquals("/api/auth/instrospect", mockWebServer.takeRequest().getPath());
     }
 
@@ -106,6 +70,27 @@ class AuthorizationServiceImplTest {
         MockResponse mockResponse = new MockResponse().setResponseCode(status.value()).
                 addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
         return mockResponse.setBody(response);
+    }
+
+    @Test
+    @SneakyThrows
+    void validateCustomerToken_ValidToken_InvalidRole_Forbidden() {
+        enqueueResponse(HttpStatus.OK, 1, "{\"userRole\": \"Broker\"}");
+        StepVerifier.create(authorizationService.validateCustomerToken("invalidToken", Arrays.asList("Employee")))
+                .expectError(ForbiddenException.class)
+                .verify();
+
+        assertEquals("/api/auth/instrospect", mockWebServer.takeRequest().getPath());
+    }
+
+    @Test
+    @SneakyThrows
+    void validateCustomerToken_InvalidToken_BadRequest() {
+        enqueueResponse(HttpStatus.FORBIDDEN, 1, "Bad Request");
+        StepVerifier.create(authorizationService.validateCustomerToken("invalidToken", Arrays.asList("Employee")))
+                .expectError(UnauthorizedException.class)
+                .verify();
+        assertEquals("/api/auth/instrospect", mockWebServer.takeRequest().getPath());
     }
 }
 

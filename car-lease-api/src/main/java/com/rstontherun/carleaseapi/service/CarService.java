@@ -32,7 +32,10 @@ public class CarService {
                 .flatMap(existingCar -> {
                     existingCar.setMake(car.getMake());
                     existingCar.setModel(car.getModel());
-                    // Set other properties as needed
+                    existingCar.setVersion(car.getVersion());
+                    existingCar.setCo2Emission(car.getCo2Emission());
+                    existingCar.setNettPrice(car.getNettPrice());
+                    existingCar.setGrossPrice(car.getGrossPrice());
                     return carRepository.save(existingCar);
                 });
     }
@@ -42,8 +45,8 @@ public class CarService {
     }
 
     public Mono<Double> getNettPriceByCarId(Integer carId) {
-            return carRepository.findById(carId)
-                    .map(Car::getNettPrice);
+        return carRepository.findById(carId)
+                .map(Car::getNettPrice);
     }
 }
 

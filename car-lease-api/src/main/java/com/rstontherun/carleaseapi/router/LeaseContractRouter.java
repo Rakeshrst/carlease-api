@@ -9,7 +9,6 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 
 @Configuration
 public class LeaseContractRouter {
-
     @Bean
     public RouterFunction<ServerResponse> leaseContractRoutes(LeaseContractHandler handler) {
         return RouterFunctions.route()

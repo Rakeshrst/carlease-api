@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -49,20 +48,20 @@ public class LeaseQuotationHandlerTest {
 
     private WebTestClient client;
 
-    private String TEST_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiRW1wbG95ZWUifV0sInN1YiI6ImNhcmxlYXNlYXBpQGF1dG9sZWFzZS5jb20iLCJpYXQiOjE2OTI3OTE0NTIsImV4cCI6MTY5Mjc5Mjg5Mn0.6TQayemPQYwwxVdJqqRw9G_7JokI_gSm8q3GSflw0L0";
+    private final String TEST_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiRW1wbG95ZWUifV0sInN1YiI6ImNhcmxlYXNlYXBpQGF1dG9sZWFzZS5jb20iLCJpYXQiOjE2OTI3OTE0NTIsImV4cCI6MTY5Mjc5Mjg5Mn0.6TQayemPQYwwxVdJqqRw9G_7JokI_gSm8q3GSflw0L0";
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
-        handler = new LeaseQuotationHandler(leaseService, customerService, carService, authService, List.of("Employee","Broker"));
+        handler = new LeaseQuotationHandler(leaseService, customerService, carService, authService, List.of("Employee", "Broker"));
         client = WebTestClient.bindToRouterFunction(new LeaseQuotationRouter().leaseQuotationRoutes(handler)).build();
     }
 
     @Test
     void calculateLeaseRate_Successful() {
-        when(carService.getNettPriceByCarId(any())).thenReturn(Mono.just(1000.0));
-        when(customerService.getCustomerByEmail(any())).thenReturn(Mono.just(new Customer()));
-        when(carService.findById(any())).thenReturn(Mono.just(Car.builder().nettPrice(45000).build()));
+        mockCarNettPrice();
+        mockGetCustomerBYEmail();
+        mockCar();
+        mockSuccessfulAuthorization();
         when(leaseService.createLeaseQuotation(any())).thenReturn(Mono.just(LeaseQuotation.builder().quotationId(123).build()));
 
         LeaseRateRequest request = getLeaseRateRequest();
@@ -75,6 +74,25 @@ public class LeaseQuotationHandlerTest {
                 .exchange()
                 .expectStatus().isCreated()
                 .expectHeader().valueMatches("location", "/leaseQuotations/123");
+    }
+
+    private void mockCarNettPrice() {
+        when(carService.getNettPriceByCarId(any())).thenReturn(Mono.just(1000.0));
+    }
+
+    private void mockGetCustomerBYEmail() {
+        when(customerService.getCustomerByEmail(any())).thenReturn(Mono.just(Customer.builder()
+                .customerId(123)
+                .emailAddress("test@rmail.com")
+                .build()));
+    }
+
+    private void mockCar() {
+        when(carService.findById(any())).thenReturn(Mono.just(Car.builder().carId(123).nettPrice(45000).build()));
+    }
+
+    private void mockSuccessfulAuthorization() {
+        when(authService.validateCustomerToken(anyString(), anyList())).thenReturn(Mono.empty());
     }
 
     private static LeaseRateRequest getLeaseRateRequest() {
@@ -90,7 +108,6 @@ public class LeaseQuotationHandlerTest {
     @Test
     void calculateLeaseRate_AuthorizationTokenMissing() {
         LeaseRateRequest request = new LeaseRateRequest();
-
         client.post()
                 .uri("/api/lease/quote")
                 .header("Authorization", "")
@@ -102,9 +119,10 @@ public class LeaseQuotationHandlerTest {
 
     @Test
     void calculateLeaseRate_CustomerNotFound() {
-        when(carService.getNettPriceByCarId(any())).thenReturn(Mono.just(1000.0));
+        mockCarNettPrice();
+        mockSuccessfulAuthorization();
         when(customerService.getCustomerByEmail(any())).thenReturn(Mono.empty());
-        when(carService.findById(any())).thenReturn(Mono.just(Car.builder().carId(1).nettPrice(1000.0).build()));
+        mockCar();
         LeaseRateRequest request = getLeaseRateRequest();
 
         client.post()
@@ -118,7 +136,8 @@ public class LeaseQuotationHandlerTest {
 
     @Test
     void calculateLeaseRate_CarNotFound() {
-        when(carService.getNettPriceByCarId(any())).thenReturn(Mono.just(1000.0));
+        mockCarNettPrice();
+        mockSuccessfulAuthorization();
         when(customerService.getCustomerByEmail(any())).thenReturn(Mono.empty());
         when(carService.findById(any())).thenReturn(Mono.empty());
 
@@ -135,7 +154,7 @@ public class LeaseQuotationHandlerTest {
 
     @Test
     void getLeaseQuotationByCustomerEmail_ValidEmail_NoQuotationsFound() {
-        when(authService.validateCustomerToken(anyString(), anyList())).thenReturn(Mono.just(TEST_TOKEN));
+        mockSuccessfulAuthorization();
 
         when(leaseService.getLeaseQuotationByCustomerEmail(anyString())).thenReturn(Flux.error(new DataNotFoundException("Quotation Not Found")));
 
@@ -159,6 +178,7 @@ public class LeaseQuotationHandlerTest {
 
     @Test
     void getLeaseQuotationByQuoteId_QuoteNotFound() {
+        mockSuccessfulAuthorization();
         when(leaseService.getLeaseQuotationById(any())).thenReturn(Mono.empty());
 
         client.get()

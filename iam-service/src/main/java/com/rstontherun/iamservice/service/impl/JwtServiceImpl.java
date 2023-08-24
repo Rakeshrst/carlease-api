@@ -36,7 +36,7 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public boolean isTokenValid(String token) {
-        System.out.println("isTokenValid Token: " + token);
+
         extractAllClaims(token);
         return !isTokenExpired(token);
     }

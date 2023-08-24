@@ -1,6 +1,5 @@
 package com.rstontherun.carleaseapi.router;
 
-import com.rstontherun.carleaseapi.handler.CarHandler;
 import com.rstontherun.carleaseapi.handler.CustomerHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

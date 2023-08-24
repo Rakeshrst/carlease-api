@@ -36,6 +36,6 @@ car:
 
 logging:
   level:
-    io.r2dbc: ERROR
-    io.r2dbc.postgresql.QUERY: ERROR # for queries
-    io.r2dbc.postgresql.PARAM: ERROR # for parameters
+    io.r2dbc: INFO
+    io.r2dbc.postgresql.QUERY: INFO # for queries
+    io.r2dbc.postgresql.PARAM: INFO # for parameters
