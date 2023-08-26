@@ -1,48 +1,70 @@
-# carlease-api
-Car Lease API with IAM
+# Car Lease API
 
-***Design***
+## _Car Lease API with Identity and Access Management (IAM)_
 
-1. Plan :
-    2. Create 4 API's
-        3. IAM
-        4. CARLEASE
-        5. CUSTOMER
-        6. CAR
-    7. Create the API Gateway and the Service Discovery Modules
+## Design
+## Plan:
 
-***Implementation Till Now***
+- Create 4 APIs
+    - IAM
+    - CARLEASE
+    - CUSTOMER
+    - CAR
+- Develop the API Gateway and Service Discovery Modules.
 
-1. IAM Service
-2. Combined service for Customer Car and Leasing. These will be split into 3
+##  Implementation Status
+- IAM Service:
+    - Register : Add a new User preferablly application user
+        - /api/auth/register
+    - Get Token : Login with a valid user and get a token
+        - /api/auth/token
+    - Validate Token : Login with a user and Validate token sent by the customer
+        - /api/auth/introspect
+- Car Lease API
+  Every request needs to be sent with a Authorization Header
+    - Customer: Add, Update, Get, Delete Customer
+    - Car: Add, Update, Get, Delete Customer
+    - Lease Quote: Using customer,  email car id and other details and get a quote on lease.
+    - Lease Contract: Based on the quotation confirm it to a lease contract.
 
-***Left To Do***
-1. Splitting into smaller Apis and also separate Databases.
-2. Add the Gateway and service Discovery
-3. Add BDD testing
-4. Add swagger file
-5. Add docker-compose to run the whole setup in containers.
+##  To-Do List
+1. Split the combined service into smaller APIs and separate databases.
+2. Integrate the API Gateway and implement Service Discovery.
+3. Implement Behavior-Driven Development (BDD) testing.
+4. Include a Swagger file for API documentation.
+5. Add a docker-compose file to run the entire setup in containers.
 
-
-**How to Run this application**
-
-1. Make sure you have docker running in your machine. 
-2. Go to the folder postgres
-   ```cd postgres```
-3. Run the docker compose command
-```docker-compose up -d```
-4. Now go to the projects **iam-service** and **car-lease-api**
-5. If you are in an IDE use the terminal or in the root folder of each folder  open a command prompt and run 
-    ```mvn spring-boot:run```
-6. Now since the applications are running Import **CarLease API.postman_collection.json** to POSTMAN 
-7. There are examples for : 
-   8. Creating Customer
-   9. Creating Car
-   10. Creating a Lease Quote 
-   11. Confirming it to a contract
-   12. Getting a leaseQuotation
-   13. Getting a lease contract. 
-14. For each request there will be a token needed. For Creation of Car alone only Employee token works for the rest Both the Broker and the Employee token works.
-
-
+## How to Run the Application
+1. Make sure Docker is installed and running on your machine.
+2. Navigate to the ***postgres*** folder:
+```sh
+cd postgres
+```
+3. Run the following docker-compose command:
+```sh
+docker-compose up -d
+```
+4. Move to the directories of iam-service and car-lease-api projects.
+5. If you're using an IDE, use the terminal within the project directory; otherwise, open a command prompt at the root of each project and run:
+```sh
+mvn spring-boot:run
+```
+7. Import the CarLease API.postman_collection.json into Postman.
+   The collection includes examples for:
+  - Creating a Customer
+  - Creating a Car
+  - Creating a Lease Quote
+  - Confirming a Lease Quote to a Contract
+  - Fetching a Lease Quotation
+  - Fetching a Lease Contract
+  Each request requires a token. For Car creation, only an Employee token is valid. For the other requests, both Broker and Employee tokens work.
+## Dockerization
+To create a Docker image for iam-service:
+```sh
+docker build -t com.rstontherun/iam-service .
+```
+To create a Docker image for car-lease-api:
+```
+docker build -t com.rstontherun/car-lease-api .
+```
 
