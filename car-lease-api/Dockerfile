@@ -1,5 +1,4 @@
 FROM eclipse-temurin:17-jdk-alpine
 VOLUME /tmp
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java","${JAVA_OPTS}","-jar","/app.jar"]
+COPY target/*.jar car-lease-api.jar
+ENTRYPOINT ["java","-jar","/car-lease-api.jar"]

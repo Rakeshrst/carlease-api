@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.rstontherun</groupId>
 	<artifactId>car-lease-api</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>car-lease-api</name>
 	<description>CarLeaseAPI</description>
 	<properties>
