@@ -3,6 +3,27 @@
 ## _Car Lease API with Identity and Access Management (IAM)_
 
 ## Design
+Scope : 
+
+Customer
+Car
+Lease --Quotation -> Contract
+
+Not in Scope: 
+Lease Payment -> Monthly
+Yearly maintenance Partnership
+
+Metrics: 
+Users(Employees/Brokers) - 100 employees - 100 MB max
+Customer - 1000/month * 12*5 - 60K for 5 years: Metadata    1KB per customer - 100 MB 
+Cars - 50k for 5 years   
+-  Metadata 1KB per car - 100MB 
+- Picture per car - 5MB - 250GB
+Signed Contract : 
+- 100 KB - 100K contract - BLOB storage  - 10GB
+Scalability Lease per day - 30 - 50 cars/day
+
+
 ## Plan:
 
 - Create 4 APIs
@@ -14,7 +35,7 @@
 
 ##  Implementation Status
 - IAM Service:
-    - Register : Add a new User preferablly application user
+    - Register : Add a new User preferably application user
         - /api/auth/register
     - Get Token : Login with a valid user and get a token
         - /api/auth/token
